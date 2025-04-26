@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css"
 
 // Base API URL - you can change this to your production URL when deploying
 // Use environment variable for better security and flexibility
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.realestatecompany.co.in/api"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
 
 // Improved User type with better organization
 type User = {

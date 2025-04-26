@@ -20,7 +20,7 @@ export default function PropertyHeader({ propertyId }: PropertyHeaderProps) {
   useEffect(() => {
     const fetchPropertyData = async () => {
       try {
-        const response = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
+        const response = await fetch(`http://localhost:5000/api/properties/${propertyId}`)
         if (!response.ok) throw new Error("Failed to fetch")
         const data = await response.json()
         setProperty({ name: data.name, location: data.location })

@@ -45,7 +45,7 @@ interface PropertyData {
 
 const fetchPropertyData = async (propertyId: string): Promise<PropertyData | null> => {
   try {
-    const res = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
+    const res = await fetch(`http://localhost:5000/api/properties/${propertyId}`)
     if (!res.ok) throw new Error("Failed to fetch property data")
     return await res.json()
   } catch (error) {
@@ -56,7 +56,7 @@ const fetchPropertyData = async (propertyId: string): Promise<PropertyData | nul
 
 const fetchBuilderData = async (propertyId: string): Promise<BuilderData | null> => {
   try {
-    const res = await fetch(`https://api.realestatecompany.co.in/api/builderdetails/${propertyId}`)
+    const res = await fetch(`http://localhost:5000/api/builderdetails/${propertyId}`)
     if (!res.ok) throw new Error("Failed to fetch builder data")
     return await res.json()
   } catch (error) {

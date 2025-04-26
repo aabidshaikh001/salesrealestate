@@ -24,7 +24,7 @@ export function AboutBuilder({ propertyId }: AboutBuilderProps) {
     
       try {
      
-        const response = await fetch(`https://api.realestatecompany.co.in/api/builderdetails/${propertyId}`)
+        const response = await fetch(`http://localhost:5000/api/builderdetails/${propertyId}`)
      
         if (!response.ok) throw new Error("Failed to fetch builder details")
         const data = await response.json()

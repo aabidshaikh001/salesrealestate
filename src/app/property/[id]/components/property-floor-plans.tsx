@@ -27,7 +27,7 @@ export default function PropertyFloorPlans({ propertyId }: PropertyFloorPlansPro
   useEffect(() => {
     const fetchFloorPlans = async () => {
       try {
-        const response = await fetch(`https://api.realestatecompany.co.in/api/floorplan/${propertyId}`);
+        const response = await fetch(`http://localhost:5000/api/floorplan/${propertyId}`);
         if (!response.ok) throw new Error("Failed to fetch floor plans");
         const data = await response.json();
         setFloorPlans(data || []);

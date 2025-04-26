@@ -26,7 +26,7 @@ export default function PropertyLoanInfo({ propertyId }: PropertyLoanInfoProps) 
      
       
   
-        const response = await fetch(`https://api.realestatecompany.co.in/api/bankinfo/${propertyId}`)
+        const response = await fetch(`http://localhost:5000/api/bankinfo/${propertyId}`)
      
         if (!response.ok) {
           throw new Error("Failed to fetch loan info")

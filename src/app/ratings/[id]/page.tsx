@@ -28,7 +28,7 @@ export default function RatingsPage() {
     const fetchRatings = async () => {
       try {
      
-        const res = await fetch(`https://api.realestatecompany.co.in/api/ratings/${propertyId}`)
+        const res = await fetch(`http://localhost:5000/api/ratings/${propertyId}`)
      
         if (!res.ok) throw new Error("Failed to fetch ratings")
 

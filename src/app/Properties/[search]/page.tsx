@@ -209,7 +209,7 @@ function SearchResultsPage({ params }: { params: { search: string } }) {
      
    
         const response = await fetch(
-          `https://api.realestatecompany.co.in/api/properties?search=${encodeURIComponent(searchQuery)}&${queryParams.toString()}`,
+          `http://localhost:5000/api/properties?search=${encodeURIComponent(searchQuery)}&${queryParams.toString()}`,
           {
             cache: "no-store",
      
