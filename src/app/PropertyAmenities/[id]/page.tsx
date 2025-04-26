@@ -31,7 +31,7 @@ export default function PropertyAmenitiesPage() {
       if (!propertyId) return
       
       try {
-        const response = await fetch(`http://localhost:5000/api/amenities/${propertyId}`)
+        const response = await fetch(`https://api.realestatecompany.co.in/api/amenities/${propertyId}`)
         if (!response.ok) {
           throw new Error("Failed to fetch amenities")
         }

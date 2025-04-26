@@ -44,7 +44,7 @@ export default function PropertyLocation({ propertyId }: PropertyLocationProps) 
     const fetchLocationData = async () => {
       try {
         // Fetch the location data
-        const locationResponse = await fetch(`http://localhost:5000/api/location/${propertyId}`)
+        const locationResponse = await fetch(`https://api.realestatecompany.co.in/api/location/${propertyId}`)
         if (!locationResponse.ok) {
           throw new Error("Failed to fetch location data")
         }
@@ -52,7 +52,7 @@ export default function PropertyLocation({ propertyId }: PropertyLocationProps) 
         setLocationData(locationData) // Assuming API returns an array of { icon, label, distance }
 
         // Fetch the property coordinates
-        const propertyResponse = await fetch(`http://localhost:5000/api/properties/${propertyId}`)
+        const propertyResponse = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
         if (!propertyResponse.ok) {
           throw new Error("Failed to fetch property data")
         }

@@ -20,7 +20,7 @@ export default function PropertyAbout({ propertyId }: PropertyAboutProps) {
       try {
      
 
-        const response = await fetch(`http://localhost:5000/api/aboutproject/${propertyId}`);
+        const response = await fetch(`https://api.realestatecompany.co.in/api/aboutproject/${propertyId}`);
         if (!response.ok) throw new Error("Failed to fetch");
         const data = await response.json();
         setAboutData((data.projectDescription?.slice(0, 200) || "No description available.") + '...');

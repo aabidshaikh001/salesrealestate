@@ -34,7 +34,7 @@ export default function PropertyLocation() {
     const fetchLocations = async () => {
       try {
      
-        const res = await fetch(`http://localhost:5000/api/location/${propertyId}`)
+        const res = await fetch(`https://api.realestatecompany.co.in/api/location/${propertyId}`)
      
         if (!res.ok) throw new Error("Failed to fetch data")
 

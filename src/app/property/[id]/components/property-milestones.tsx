@@ -22,7 +22,7 @@ export default function PropertyMilestones({ propertyId }: PropertyMilestonesPro
     const fetchMilestoneData = async () => {
       try {
      
-        const response = await fetch(`http://localhost:5000/api/milestone/${propertyId}`)
+        const response = await fetch(`https://api.realestatecompany.co.in/api/milestone/${propertyId}`)
      
         if (!response.ok) {
           throw new Error("Failed to fetch milestone data")

@@ -17,7 +17,7 @@ export default function AboutProjectPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/aboutproperty/${propertyId}`)
+        const res = await fetch(`https://api.realestatecompany.co.in/api/aboutproperty/${propertyId}`)
         const data = await res.json()
         setAboutData(data.description)
       } catch (error) {
@@ -36,7 +36,7 @@ const [projectDetails, setProjectDetails] = useState("");
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/aboutproject/${propertyId}`);
+      const res = await fetch(`https://api.realestatecompany.co.in/api/aboutproject/${propertyId}`);
       const data = await res.json();
       setProjectName(data.projectName || "");
       setProjectDescription(data.projectDescription || "");

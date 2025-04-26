@@ -40,7 +40,7 @@ export default function BuilderDetailsPage() {
      
       
   
-        const response = await fetch(`http://localhost:5000/api/builderdetails/${id}`)
+        const response = await fetch(`https://api.realestatecompany.co.in/api/builderdetails/${id}`)
      
         if (!response.ok) throw new Error("Failed to fetch builder details")
         const data: BuilderDetails = await response.json()

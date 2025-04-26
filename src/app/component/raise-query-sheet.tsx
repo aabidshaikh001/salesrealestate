@@ -53,7 +53,7 @@ export default function RaiseQuerySheet({ isOpen, onClose }: RaiseQuerySheetProp
      
   
   
-      const response = await fetch("http://localhost:5000/api/query", {
+      const response = await fetch("https://api.realestatecompany.co.in/api/query", {
      
         method: "POST",
         headers: {
