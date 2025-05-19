@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Fetch user data from API
-        const response = await apiRequest<User>("/profile", "GET", undefined, token)
+        const response = await apiRequest<User>("/user/profile", "GET", undefined, token)
 
         if (response.success && response.data) {
           setUser(response.data)
@@ -287,6 +287,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!token) {
         throw new Error("Authentication required")
       }
+
+
   
       // Ensure `id` is defined
       if (!user?.id) {
@@ -294,7 +296,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
   
       // Call the API to update user profile
-      const response = await apiRequest<User>("/profile", "PUT", userData, token)
+      const response = await apiRequest<User>("/user/profile", "PUT", userData, token)
   
       if (response.success && response.data) {
         setUser(response.data) // Update state with new user data

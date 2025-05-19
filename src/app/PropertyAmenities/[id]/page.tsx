@@ -4,9 +4,11 @@ import { useRouter, useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { FaArrowLeft, FaRulerCombined, FaBed, FaBath, FaParking } from "react-icons/fa"
+import Image from "next/image"
 
 type Amenity = {
-  iconKey: string
+  iconKey?: string
+  icon?: string
   label: string
 }
 
@@ -15,6 +17,37 @@ const iconMap: Record<string, React.ElementType> = {
   beds: FaBed,
   baths: FaBath,
   parking: FaParking,
+}
+
+// Helper component to render the appropriate icon
+const AmenityIcon = ({ iconKey, icon }: { iconKey?: string; icon?: string }) => {
+  // Case 1: Use predefined component from iconMap
+  if (iconKey && iconMap[iconKey]) {
+    const IconComponent = iconMap[iconKey]
+    return <IconComponent className="text-gray-500 text-2xl" />
+  }
+  
+  // Case 2: Icon is an image URL
+  if (icon && (icon.startsWith("http") || icon.startsWith("/"))) {
+    return (
+      <div className="relative w-8 h-8">
+        <Image 
+          src={icon || "/placeholder.svg"} 
+          alt="Amenity icon" 
+          width={32} 
+          height={32} 
+          className="object-contain"
+          onError={(e) => {
+            // Fallback to a default icon if image fails to load
+            e.currentTarget.src = "/placeholder.svg?height=32&width=32"
+          }}
+        />
+      </div>
+    )
+  }
+  
+  // Case 3: Icon is a text/emoji
+  return <span className="text-2xl">{icon || "🏠"}</span>
 }
 
 export default function PropertyAmenitiesPage() {
@@ -72,7 +105,14 @@ export default function PropertyAmenitiesPage() {
       {/* Main content */}
       <main className="pt-16 pb-4 px-4">
         {loading ? (
-          <p className="text-center text-gray-500">Loading amenities...</p>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {[...Array(8)].map((_, index) => (
+              <div key={index} className="flex flex-col items-center p-4 border rounded-lg shadow-sm animate-pulse">
+                <div className="w-12 h-12 bg-gray-200 rounded-full mb-2"></div>
+                <div className="h-4 w-20 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : amenities.length > 0 ? (
@@ -85,24 +125,21 @@ export default function PropertyAmenitiesPage() {
             }}
             className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
           >
-            {amenities.map((amenity, index) => {
-              const Icon = iconMap[amenity.iconKey] || FaRulerCombined
-              return (
-                <motion.div
-                  key={index}
-                  variants={{
-                    hidden: { y: 20, opacity: 0 },
-                    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } },
-                  }}
-                  className="flex flex-col items-center p-4 border rounded-lg shadow-sm"
-                >
-                  <div className="w-12 h-12 flex items-center justify-center mb-2">
-                    <Icon className="text-gray-500 text-2xl" />
-                  </div>
-                  <span className="text-sm text-gray-700 font-medium">{amenity.label}</span>
-                </motion.div>
-              )
-            })}
+            {amenities.map((amenity, index) => (
+              <motion.div
+                key={index}
+                variants={{
+                  hidden: { y: 20, opacity: 0 },
+                  visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } },
+                }}
+                className="flex flex-col items-center p-4 border rounded-lg shadow-sm"
+              >
+                <div className="w-12 h-12 flex items-center justify-center mb-2">
+                  <AmenityIcon iconKey={amenity.iconKey} icon={amenity.icon} />
+                </div>
+                <span className="text-sm text-gray-700 font-medium">{amenity.label}</span>
+              </motion.div>
+            ))}
           </motion.div>
         ) : (
           <p className="text-center text-gray-500">No amenities available for this property.</p>
