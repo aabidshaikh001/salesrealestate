@@ -18,6 +18,7 @@ import { BrochureCard } from "./components/brochure-card"
 import { PriceTrend } from "./components/price-trend"
 import { Ratings } from "./components/ratings"
 import { TermsConditions } from "./components/terms-conditions"
+import PropertyDescription from "./components/property-description"
 
 export default function PropertyDetails() {
   const params = useParams()
@@ -28,22 +29,28 @@ export default function PropertyDetails() {
       <PropertyHeader propertyId={propertyId} />
       <PropertyImages propertyId={propertyId} />
       <PropertyInfo propertyId={propertyId} />
+      <PropertyDescription propertyId={propertyId} />
+         <PropertyLocation propertyId={propertyId} />
+       <PropertyAmenities propertyId={propertyId} />
       <PropertyFloorPlans propertyId={propertyId} />
-      <PropertyAmenities propertyId={propertyId} />
-      <PropertyLocation propertyId={propertyId} />
+     
+   
       <PropertyAbout propertyId={propertyId} />
-      <PropertyBrokerage propertyId={propertyId} />
-      <PropertyMilestones propertyId={propertyId} />
-      <PropertyPaymentPlan propertyId={propertyId} />
-      <PropertyLoanInfo propertyId={propertyId} />
-      <PropertyCTA propertyId={propertyId} />
-      <div className="max-w-md mx-auto space-y-6 pb-8">
+    
       <AboutBuilder propertyId={propertyId} />
       <BrochureCard propertyId={propertyId} />
-      <PriceTrend />
-      <Ratings propertyId={propertyId} />
-      <TermsConditions />
-    </div>
+          {/* <Ratings propertyId={propertyId} />
+      <PriceTrend /> */}
+  
+      {/* <TermsConditions /> */}
+ 
+        <PropertyPaymentPlan propertyId={propertyId} />
+      <PropertyLoanInfo propertyId={propertyId} />
+      <PropertyBrokerage propertyId={propertyId} />
+      <PropertyMilestones propertyId={propertyId} />
+    
+      <PropertyCTA propertyId={propertyId} />
+      
     </div>
   )
 }

@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/providers/auth-provider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { FileText } from "lucide-react"
+import { Bell } from "lucide-react"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, User, LogIn, Settings} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
@@ -57,7 +61,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="bg-white dark:bg-gray-900 p-4 flex items-center justify-between z-10 shadow-sm"
+      className="bg-gradient-to-br from-amber-300 to-yellow-300  p-4 flex items-center justify-between z-10 shadow-sm"
       initial={{ y: -50 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3 }}
@@ -67,7 +71,7 @@ export default function Header() {
         <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/dashboard")}
           className="cursor-pointer"
         >
           <Image
@@ -85,46 +89,34 @@ export default function Header() {
       {/* Right Side Icons */}
       <div className="flex gap-4 items-center">
      
+{/* FileText Icon (Reports or Docs) */}
 
-         {/* Notifications */}
-         <Tooltip>
-            <TooltipTrigger asChild>
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="relative">
-                <Button variant="ghost" size="icon" onClick={handleNotificationsClick} className="relative">
-                  <BellRing className="h-7 w-7 text-gray-700 dark:text-white" />
-                  {notificationCount > 0 && (
-                    <Badge
-                      className="absolute -top-1.5 -right-1.5 h-5 w-5 flex items-center justify-center bg-red-600 text-white text-xs font-bold shadow-md"
-                      variant="destructive"
-                    >
-                      {notificationCount}
-                    </Badge>
-                  )}
-                </Button>
-              </motion.div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Notifications</p>
-            </TooltipContent>
-          </Tooltip>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <FileText className="h-8 w-8 text-gray-700" />
+            </motion.div>
+  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <div className="relative">
+                <Bell className="h-8 w-8 text-red-600 fill-red-600" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">3</span>
+                </div>
+              </div>
+            </motion.div>
           
         {/* Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Button variant="ghost" size="icon">
-                {user?.image ? ( // Safely check if user.image exists/
-                  <Image
-                    src={user?.image} 
-                    alt="Profile"
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <CgProfile className="h-7 w-7" />
-                )}
-              </Button>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="cursor-pointer flex items-center"
+            >
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={user?.image || "/placeholder.svg"} alt={user?.name || "User"} />
+                <AvatarFallback className="bg-amber-600 text-white font-bold">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
             </motion.div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">

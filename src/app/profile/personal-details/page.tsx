@@ -145,7 +145,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="flex items-center p-4 border-b bg-white shadow-sm sticky top-0 z-10">
-        <Link href="/" className="mr-4 hover:bg-gray-100 p-2 rounded-full transition-colors">
+        <Link href="/dashboard" className="mr-4 hover:bg-gray-100 p-2 rounded-full transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <h1 className="text-lg font-medium">My Profile</h1>

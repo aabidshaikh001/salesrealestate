@@ -44,7 +44,7 @@ export function BrochureCard({ propertyId }: BrochureCardProps) {
 
   return (
     <div className="space-y-3 px-4">
-      <h2 className="text-lg font-bold">View official brochure</h2>
+      <h2 className="text-lg font-bold">Project Brochure</h2>
       <motion.div whileTap={{ scale: 0.98 }} className="relative overflow-hidden rounded-xl shadow-md">
         <Card className="bg-gradient-to-br from-blue-900 to-indigo-900 text-white cursor-pointer overflow-hidden">
           <CardContent className="p-6 flex flex-col items-center justify-center min-h-[180px] relative">

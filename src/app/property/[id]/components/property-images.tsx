@@ -3,20 +3,20 @@
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence, type PanInfo, useAnimation } from "framer-motion"
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Edit, X, Check, Maximize, Minimize } from "lucide-react"
+import { ChevronLeft, ChevronRight, Maximize, Minimize } from "lucide-react"
 
 interface PropertyImagesProps {
   propertyId: string
 }
 
-// Available filters for image editing
-const filters = [
-  { name: "Normal", value: "none" },
-  { name: "Grayscale", value: "grayscale(100%)" },
-  { name: "Sepia", value: "sepia(100%)" },
-  { name: "Brightness", value: "brightness(150%)" },
-  { name: "Contrast", value: "contrast(150%)" },
-]
+// // Available filters for image editing
+// const filters = [
+//   { name: "Normal", value: "none" },
+//   { name: "Grayscale", value: "grayscale(100%)" },
+//   { name: "Sepia", value: "sepia(100%)" },
+//   { name: "Brightness", value: "brightness(150%)" },
+//   { name: "Contrast", value: "contrast(150%)" },
+// ]
 
 export default function PropertyImages({ propertyId }: PropertyImagesProps) {
   const [propertyData, setPropertyData] = useState<{
@@ -24,7 +24,11 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
     title: string
     brokerage: string
     tag: string
-    readyToMove: boolean
+    propertyType: string
+    propertyFor: string
+    status: string
+    visitBonus: string
+    discount: string
   } | null>(null)
 
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -41,27 +45,43 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
   useEffect(() => {
     const fetchPropertyData = async () => {
       try {
-        const response = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
-        if (!response.ok) throw new Error("Failed to fetch property data")
-
-        const data = await response.json()
+        // Fetch property details
+        const propertyResponse = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
+        if (!propertyResponse.ok) throw new Error("Failed to fetch property data")
+        const propertyData = await propertyResponse.json()
 
         let parsedImages: string[] = []
-        if (data.images) {
+        if (propertyData.images) {
           try {
-            parsedImages = typeof data.images === "string" ? JSON.parse(data.images) : data.images
+            parsedImages =
+              typeof propertyData.images === "string" ? JSON.parse(propertyData.images) : propertyData.images
           } catch (error) {
             console.error("Error parsing images:", error)
             parsedImages = []
           }
         }
 
-        setPropertyData({
-          ...data,
-          images: parsedImages,
-        })
+        // Fetch brokerage data
+        const brokerageResponse = await fetch(`https://api.realestatecompany.co.in/api/brokerages/${propertyId}`)
+        if (!brokerageResponse.ok) throw new Error("Failed to fetch brokerage data")
+        const brokerageData = await brokerageResponse.json()
+
+        // We assume the API returns an array of brokerages, so we'll take the first one for now
+        const brokerageItem = brokerageData[0] || {}
+
+        // Update state with combined data
+       setPropertyData({
+  ...propertyData,
+  images: parsedImages,
+  brokerage: brokerageItem.brokerage || "",
+  tag: brokerageItem.tag || "",
+  visitBonus: brokerageItem.visitBonus || "",
+  propertyFor: propertyData.propertyFor || "",
+  status: propertyData.status || "",
+  discount: brokerageItem.discount || "", // ✅ Add this line
+})
       } catch (err) {
-        console.error("Could not load property data:", err)
+        console.error("Could not load property or brokerage data:", err)
       }
     }
 
@@ -195,13 +215,25 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button
-            onClick={nextImage}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 rounded-full p-2 shadow-md"
-            aria-label="Next image"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2">
+  <button
+    onClick={nextImage}
+    className="bg-white/70 rounded-full p-2 shadow-md"
+    aria-label="Next image"
+  >
+    <ChevronRight className="w-5 h-5" />
+  </button>
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={toggleFullscreen}
+    className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md"
+    aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+  >
+    {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+  </motion.button>
+</div>
+
         </>
       )}
 
@@ -220,20 +252,34 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
       {/* Tags */}
       {!isEditing && (
         <>
+          {/* Left side - Property For tag */}
           <div className="absolute top-4 left-4 flex flex-col gap-2">
-            <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-md">RERA</span>
-            <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-md">{propertyData?.brokerage}</span>
-          </div>
-
-          <div className="absolute top-4 right-4">
-            <span className="bg-amber-400 text-white text-xs px-3 py-1 rounded-md">{propertyData?.tag}</span>
-          </div>
-
-          <div className="absolute bottom-16 left-4">
-            <span className="bg-gray-800 text-white text-xs px-3 py-1 rounded-md">
-              {propertyData?.readyToMove ? "Ready to Move" : "Under Construction"}
+            <span className="bg-green-500 text-white text-xs px-3 py-1 rounded-md">
+              {propertyData?.propertyFor === "Rent" ? "For Rent" : "For Sale"}
             </span>
+             {propertyData?.propertyType && (
+              <span className="bg-gray-800 text-white text-xs px-3 py-1 rounded-md">{propertyData.propertyType}</span>
+            )}
+            {propertyData?.status && (
+              <span className="bg-red-500 text-white text-xs px-3 py-1 rounded-md">{propertyData.status}</span>
+            )}
           </div>
+
+          {/* Right side - Brokerage, Tag, and Visit Bonus */}
+          <div className="absolute top-4 right-4 flex flex-col gap-2">
+             {propertyData?.tag && (
+              <span className="bg-amber-400 text-white text-xs px-3 py-1 rounded-md">{propertyData.tag}</span>
+            )}
+            {propertyData?.discount && (
+              <span className="bg-blue-500 text-white text-xs px-3 py-1 rounded-md">Discount: {propertyData.discount}</span>
+            )}
+           
+            {propertyData?.brokerage && (
+              <span className="bg-purple-500 text-white text-xs px-3 py-1 rounded-md">Brokerage: {propertyData.brokerage}</span>
+            )}
+          </div>
+
+         
         </>
       )}
 
@@ -272,7 +318,7 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
 
       {/* Controls Toolbar */}
       <div className="absolute top-16 right-4 flex flex-col gap-2">
-        <motion.button
+        {/* <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleZoomIn}
@@ -281,8 +327,8 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
           aria-label="Zoom in"
         >
           <ZoomIn className="w-5 h-5" />
-        </motion.button>
-        <motion.button
+        </motion.button> */}
+        {/* <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleZoomOut}
@@ -291,8 +337,8 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
           aria-label="Zoom out"
         >
           <ZoomOut className="w-5 h-5" />
-        </motion.button>
-        <motion.button
+        </motion.button> */}
+        {/* <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsEditing(!isEditing)}
@@ -300,19 +346,11 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
           aria-label="Edit image"
         >
           <Edit className="w-5 h-5" />
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={toggleFullscreen}
-          className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md"
-          aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-        >
-          {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
-        </motion.button>
+        </motion.button> */}
+       
       </div>
 
-      {/* Editing Panel */}
+      {/* Editing Panel
       {isEditing && (
         <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
           <div className="bg-white rounded-lg p-4 w-[90%] max-w-md">
@@ -323,7 +361,7 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
               </button>
             </div>
 
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <h4 className="text-sm font-medium mb-2">Filters</h4>
               <div className="grid grid-cols-3 gap-2">
                 {filters.map((filter) => (
@@ -338,9 +376,9 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
                   </button>
                 ))}
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex justify-end">
+      {/* <div className="flex justify-end">
               <button
                 onClick={() => setIsEditing(false)}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center"
@@ -350,7 +388,7 @@ export default function PropertyImages({ propertyId }: PropertyImagesProps) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Image Counter */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 text-white text-xs px-2 py-1 rounded-full">

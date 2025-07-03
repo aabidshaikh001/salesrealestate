@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { useAuth } from "@/providers/auth-provider"
 import { Button } from "@/components/ui/button"
@@ -10,7 +9,8 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import LoadingSpinner from "@/components/loading-spinner"
 import { motion } from "framer-motion"
-import { FaArrowLeft, FaEnvelope, FaShieldAlt } from "react-icons/fa"
+import { ArrowLeft, Mail, Shield } from "lucide-react"
+import Image from "next/image"
 
 export default function VerifyOtpPage() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
@@ -105,136 +105,137 @@ export default function VerifyOtpPage() {
 
   return (
     <motion.div
-      className="flex min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
+      className="flex flex-col min-h-screen text-gray-800 relative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
-      {/* Left side decoration - visible on larger screens */}
-      <motion.div
-        className="hidden lg:flex lg:w-1/2 bg-red-600 items-center justify-center relative overflow-hidden"
-        initial={{ x: -50, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="absolute inset-0 bg-red-700 opacity-20">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: "url('/placeholder.svg?height=800&width=800')",
-              backgroundSize: "cover",
-              mixBlendMode: "overlay",
-            }}
-          ></div>
-        </div>
-        <div className="relative z-10 text-white text-center max-w-md p-8">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-          >
-            <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
-            <p className="text-red-100 mb-6">
-              We&apos;re excited to have you back. Please verify your identity to continue.
-            </p>
-            <div className="flex justify-center">
-              <FaShieldAlt className="text-white opacity-20 h-32 w-32" />
+      {/* Full-screen background image */}
+      <div className="fixed inset-0 z-0">
+        <Image src="https://www.loft.co.uk/cdn/shop/files/Install_Team_Chapel_Wharf_LOFT_46.jpg" alt="Background" fill priority className="object-cover" />
+        <div className="absolute inset-0 bg-black/30" /> {/* Overlay to ensure text readability */}
+      </div>
+
+      <div className="flex flex-col items-center justify-center min-h-screen p-5 relative z-10">
+        {/* Back button */}
+        <motion.div
+          className="w-full max-w-md mb-6"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Link href="/login" className="inline-flex items-center text-white hover:text-blue-200 transition-colors">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            <span>Back to login</span>
+          </Link>
+        </motion.div>
+
+        <motion.div
+          className="w-full max-w-md bg-white/20 backdrop-blur-lg rounded-xl shadow-lg p-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div className="mb-8 text-center" variants={itemVariants}>
+            <div className="flex justify-center mb-4">
+              <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center">
+                <Mail className="h-8 w-8 text-blue-600" />
+              </div>
             </div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Right side - form */}
-      <motion.div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-8" variants={itemVariants}>
-        <div className="w-full max-w-md">
-          <motion.div className="mb-8" variants={itemVariants}>
-            <Link href="/login" className="inline-flex items-center text-red-600 hover:text-red-800 transition-colors">
-              <FaArrowLeft className="mr-2 h-4 w-4" />
-              <span>Back to login</span>
-            </Link>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Verify Your Email</h1>
+            <p className="text-gray-600 text-sm">We've sent a verification code to</p>
+            <p className="text-gray-800 font-medium text-sm">{email || "your email"}</p>
           </motion.div>
 
-          <motion.div
-            className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100"
-            variants={itemVariants}
-          >
-            <div className="p-8">
-              <div className="flex items-center mb-6">
-                <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mr-4">
-                  <FaEnvelope className="h-5 w-5 text-red-600" />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.div className="space-y-4" variants={itemVariants}>
+              <label htmlFor="otp-1" className="text-sm font-medium text-gray-700 block text-center">
+                Enter 6-digit verification code
+              </label>
+
+              <div className="flex justify-between gap-2">
+                {otp.map((digit, index) => (
+                  <motion.div key={index} whileFocus={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full">
+                    <Input
+                      id={`otp-${index + 1}`}
+                      ref={(el) => {
+                        inputRefs.current[index] = el
+                      }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={index === 0 ? handlePaste : undefined}
+                      disabled={isLoading}
+                      required
+                      className="h-14 text-center text-xl font-bold border-2 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+
+              <p className="text-xs text-center text-gray-500">For demo purposes, enter any 6-digit code</p>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Button
+                type="submit"
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2"
+                disabled={isLoading || otp.some((digit) => !digit)}
+              >
+                {isLoading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <>
+                    <Shield className="h-4 w-4" />
+                    Verify & Sign In
+                  </>
+                )}
+              </Button>
+            </motion.div>
+
+            <motion.div className="text-center space-y-4" variants={itemVariants}>
+              <p className="text-sm text-gray-600">
+                Didn't receive the code?{" "}
+                <button
+                  type="button"
+                  className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                  onClick={() => {
+                    // Add resend logic here
+                    console.log("Resend code")
+                  }}
+                >
+                  Resend
+                </button>
+              </p>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-gray-200" />
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-800">Verify Your Email</h1>
-                  <p className="text-gray-600 text-sm">
-                    We&apos;ve sent a code to <span className="font-medium">{email || "your email"}</span>
-                  </p>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-400 font-medium">Or</span>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <label htmlFor="otp-1" className="text-sm font-medium text-gray-700 block">
-                    Enter verification code
-                  </label>
+              <Link href="/login" className="inline-block text-sm text-gray-600 hover:text-gray-800 transition-colors">
+                Try a different email address
+              </Link>
+            </motion.div>
+          </form>
+        </motion.div>
 
-                  <div className="flex justify-between gap-2">
-                    {otp.map((digit, index) => (
-                      <motion.div
-                        key={index}
-                        whileFocus={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-full"
-                      >
-                        <Input
-                          id={`otp-${index + 1}`}
-                          ref={(el) => {
-                            inputRefs.current[index] = el
-                          }}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          value={digit}
-                          onChange={(e) => handleOtpChange(index, e.target.value)}
-                          onKeyDown={(e) => handleKeyDown(index, e)}
-                          onPaste={index === 0 ? handlePaste : undefined}
-                          disabled={isLoading}
-                          required
-                          className="h-14 text-center text-xl font-bold border-2 focus:border-red-500 focus:ring-red-500"
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <p className="text-xs text-center text-gray-500">For demo purposes, enter any 6-digit code</p>
-                </div>
-
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    type="submit"
-                    className="w-full h-12 bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center gap-2"
-                    disabled={isLoading || otp.some((digit) => !digit)}
-                  >
-                    {isLoading ? <LoadingSpinner /> : "Verify & Sign In"}
-                  </Button>
-                </motion.div>
-
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Didn&apos;t receive a code?{" "}
-                    <Link href="/login" className="font-medium text-red-600 hover:text-red-800 transition-colors">
-                      Try again
-                    </Link>
-                  </p>
-                </div>
-              </form>
-            </div>
-          </motion.div>
-
-          <motion.div className="mt-8 text-center text-sm text-gray-500" variants={itemVariants}>
-            © {new Date().getFullYear()} Your Company. All rights reserved.
-          </motion.div>
-        </div>
-      </motion.div>
+        <motion.div
+          className="mt-8 text-center text-sm text-white/70"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          © {new Date().getFullYear()} TREC. All rights reserved.
+        </motion.div>
+      </div>
     </motion.div>
   )
 }

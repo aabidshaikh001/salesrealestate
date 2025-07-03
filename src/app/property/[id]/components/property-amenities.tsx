@@ -12,7 +12,7 @@ interface PropertyAmenitiesProps {
 interface Amenity {
   icon: string
   iconKey?: string
-  label: string
+  name: string
 }
 
 // Helper component to render the appropriate icon
@@ -46,19 +46,20 @@ export default function PropertyAmenities({ propertyId }: PropertyAmenitiesProps
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchAmenities = async () => {
-      try {
-        const response = await fetch(`https://api.realestatecompany.co.in/api/amenities/${propertyId}`)
-        if (!response.ok) throw new Error("Failed to fetch")
-        const data: Amenity[] = await response.json()
-        setAmenities(data)
-      } catch (error) {
-        console.error("Error fetching amenities:", error)
-        setAmenities([])
-      } finally {
-        setLoading(false)
-      }
-    }
+   const fetchAmenities = async () => {
+  try {
+    const response = await fetch(`https://api.realestatecompany.co.in/api/amenities/${propertyId}`);
+    if (!response.ok) throw new Error("Failed to fetch");
+    const responseData = await response.json();
+    const data: Amenity[] = responseData.data || [];
+    setAmenities(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error("Error fetching amenities:", error);
+    setAmenities([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchAmenities()
   }, [propertyId])
@@ -87,7 +88,7 @@ export default function PropertyAmenities({ propertyId }: PropertyAmenitiesProps
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="p-4 border-b">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-semibold text-lg">Project Amenities</h3>
+        <h3 className="font-semibold text-lg">Property Amenities</h3>
       </div>
 
       {loading ? (
@@ -106,7 +107,7 @@ export default function PropertyAmenities({ propertyId }: PropertyAmenitiesProps
               <div className="w-12 h-12 flex items-center justify-center mb-1">
                 <AmenityIcon icon={amenity.icon} />
               </div>
-              <span className="text-xs text-gray-700 text-center">{amenity.label}</span>
+              <span className="text-xs text-gray-700 text-center">{amenity.name}</span>
             </motion.div>
           ))}
         </div>

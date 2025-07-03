@@ -22,7 +22,24 @@ interface BuilderData {
   logo: string
   name?: string
 }
+interface ProjectData {
+  projectId: number
+  builderId: number
+  // other project fields
+}
 
+
+interface BrokerageData {
+  PropBrokId: number
+  PropertyId: string
+  brokerage: string
+  tag: string
+  discount: string
+  visitBonus: string
+
+  IsActive: boolean
+  IsDeleted: boolean
+}
 interface PropertyData {
   id: string
   title: string
@@ -31,18 +48,28 @@ interface PropertyData {
   bhkOptions: string | Array<string | BHKOption>
   price: string
   pricePerSqft?: string
-  discount?: string
-  visitBonus?: string
+  
   images: string | string[]
   builderId?: string
   propertyType?: string
   status?: string
-  tag?: string
+
   readyToMove?: boolean
   superBuiltUpArea?: string
   carpetArea?: string | null
+  projectId?: string
 }
-
+const fetchBrokerageData = async (propertyId: string): Promise<BrokerageData | null> => {
+  try {
+    const res = await fetch(`https://api.realestatecompany.co.in/api/brokerages/${propertyId}`)
+    if (!res.ok) throw new Error("Failed to fetch brokerage data")
+    const data = await res.json()
+    return data[0] ?? null // API returns array, take first element or null
+  } catch (error) {
+    console.error("Error fetching brokerage data:", error)
+    return null
+  }
+}
 const fetchPropertyData = async (propertyId: string): Promise<PropertyData | null> => {
   try {
     const res = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
@@ -56,9 +83,30 @@ const fetchPropertyData = async (propertyId: string): Promise<PropertyData | nul
 
 const fetchBuilderData = async (propertyId: string): Promise<BuilderData | null> => {
   try {
-    const res = await fetch(`https://api.realestatecompany.co.in/api/builderdetails/${propertyId}`)
-    if (!res.ok) throw new Error("Failed to fetch builder data")
-    return await res.json()
+    // Step 1: fetch property to get projectId
+    const propertyRes = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
+    if (!propertyRes.ok) throw new Error("Property not found")
+    const propertyData: PropertyData = await propertyRes.json()
+
+    if (!propertyData.projectId) {
+      throw new Error("No project associated with this property")
+    }
+
+    // Step 2: fetch project to get builderId
+    const projectRes = await fetch(`https://api.realestatecompany.co.in/api/aboutproject/${propertyData.projectId}`)
+    if (!projectRes.ok) throw new Error("Project not found")
+    const projectData: ProjectData = (await projectRes.json()).data
+
+    if (!projectData.builderId) {
+      throw new Error("No builder associated with this project")
+    }
+
+    // Step 3: fetch builder details
+    const builderRes = await fetch(`https://api.realestatecompany.co.in/api/builderdetails/${projectData.builderId}`)
+    if (!builderRes.ok) throw new Error("Builder not found")
+    const builderData: BuilderData = await builderRes.json()
+
+    return builderData
   } catch (error) {
     console.error("Error fetching builder data:", error)
     return null
@@ -66,6 +114,8 @@ const fetchBuilderData = async (propertyId: string): Promise<BuilderData | null>
 }
 
 export default function PropertyInfo({ propertyId }: PropertyInfoProps) {
+  const [brokerageData, setBrokerageData] = useState<BrokerageData | null>(null)
+
   const [propertyData, setPropertyData] = useState<PropertyData | null>(null)
   const [builderData, setBuilderData] = useState<BuilderData | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -74,27 +124,30 @@ export default function PropertyInfo({ propertyId }: PropertyInfoProps) {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        const property = await fetchPropertyData(propertyId)
-        setPropertyData(property)
+  const fetchData = async () => {
+    try {
+      setLoading(true)
 
-        // Fetch builder data using propertyId
-        const builder = await fetchBuilderData(propertyId)
-        setBuilderData(builder)
-      } catch (err) {
-        setError("Failed to load property details")
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
+      const property = await fetchPropertyData(propertyId)
+      setPropertyData(property)
+
+      // Use the new fetchBuilderData chaining function
+      const builder = await fetchBuilderData(propertyId)
+      setBuilderData(builder)
+
+      const brokerage = await fetchBrokerageData(propertyId)
+      setBrokerageData(brokerage)
+    } catch (err) {
+      setError("Failed to load property details")
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    fetchData()
-  }, [propertyId])
-
-  // Parse bhkOptions safely
+  fetchData()
+}, [propertyId])
+// Parse bhkOptions safely
   const bhkOptions = useMemo(() => {
     if (!propertyData?.bhkOptions) return []
     try {
@@ -158,16 +211,6 @@ export default function PropertyInfo({ propertyId }: PropertyInfoProps) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <Image
-              src={builderData?.logo || "/placeholder.svg"}
-              alt={builderData?.name ? `${builderData.name} logo` : "Builder logo"}
-              width={40}
-              height={40}
-              className="w-10 h-10 rounded-full object-cover"
-              onError={(e) => {
-                ;(e.target as HTMLImageElement).src = "/placeholder.svg"
-              }}
-            />
             <div>
               <h1 className="text-xl font-bold">{propertyData.title}</h1>
               <p className="text-sm text-gray-500">{propertyData.location}</p>
@@ -194,18 +237,12 @@ export default function PropertyInfo({ propertyId }: PropertyInfoProps) {
             </div>
           )}
         </div>
-        <button
-          className="text-gray-600 hover:text-gray-800"
-          aria-label="Share property"
-          onClick={() => setIsShareModalOpen(true)}
-        >
-          <FaShareAlt />
-        </button>
+       
       </div>
 
-      {/* BHK Options */}
+      {/* BHK Options
       {formattedBhkOptions.length > 0 && (
-        <div className="flex justify-between mt-6">
+        <div className="flex mt-6 gap-3">
           {formattedBhkOptions.map((option, index) => (
             <motion.div key={index} whileHover={{ y: -3 }} className="flex flex-col items-center">
               <div className="w-12 h-12 flex items-center justify-center border border-gray-200 rounded-md mb-1">
@@ -215,31 +252,26 @@ export default function PropertyInfo({ propertyId }: PropertyInfoProps) {
             </motion.div>
           ))}
         </div>
-      )}
+      )} */}
 
       {/* Price */}
       <div className="mt-6">
         <h2 className="text-2xl font-bold">{propertyData.price}</h2>
         {propertyData.pricePerSqft && <p className="text-sm text-gray-500">{propertyData.pricePerSqft}/sq.ft</p>}
-        {propertyData.discount && <p className="text-sm text-green-600">{propertyData.discount}</p>}
+   {brokerageData?.visitBonus && (
+  <p className="text-sm text-green-600">Visit Bonus: {brokerageData.visitBonus}</p>
+)}
+
       </div>
 
-      {/* CTA Button */}
+      {/* CTA Button
       <motion.div className="mt-4" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Button className="w-full rounded-md bg-blue-500 hover:bg-blue-600" onClick={() => setIsModalOpen(true)}>
-          Book Visit
+          Create Lead
         </Button>
-      </motion.div>
+      </motion.div> */}
 
-      {/* Visit Bonus */}
-      {propertyData.visitBonus && (
-        <div className="mt-3 flex justify-center">
-          <span className="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded-md">
-            {propertyData.visitBonus}
-          </span>
-        </div>
-      )}
-
+  
       <BookingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

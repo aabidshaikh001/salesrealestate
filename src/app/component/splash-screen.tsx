@@ -3,23 +3,40 @@ import { motion } from "framer-motion";
 import Image from "next/image"; // Use this if you're in a Next.js project
 
 
+
 export default function SplashScreen() {
-  return (
+ return (
     <motion.div
-      className="fixed inset-0 flex flex-col items-center justify-center bg-white z-50"
-      initial={{ opacity: 1 }}
+      className="fixed inset-0 flex flex-col items-center justify-center z-50 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.div
-        className="flex flex-col items-center"
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-     
-          {/* Replace the icon with the logo */}
-            <Image 
+      {/* Gradient background matching the image */}
+      <div className="fixed inset-0 bg-gradient-to-b from-orange-100 via-white to-orange-200" />
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full px-8">
+      {/* Logo - THE REAL ESTATE COMPANY */}
+<motion.div
+  className="text-center mb-16"
+  initial={{ opacity: 0, y: -30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: "easeOut" }}
+>
+  <motion.div
+    className="relative"
+    animate={{
+      scale: [1, 1.02, 1],
+    }}
+    transition={{
+      duration: 3,
+      repeat: Number.POSITIVE_INFINITY,
+      ease: "easeInOut",
+    }}
+  >
+   <Image 
              src="/logo.png" 
              alt="TREC Logo" 
              width={260} 
@@ -27,63 +44,62 @@ export default function SplashScreen() {
               style={{ filter: "brightness(0) saturate(100%) invert(50%) sepia(92%) saturate(7400%) hue-rotate(0deg)" }}
          className="object-contain filter invert-[22%] sepia-[100%] saturate-[10000%] hue-rotate-[0deg] brightness-[103%] contrast-[104%]" 
            />
+  </motion.div>
+</motion.div>
 
-    
-
+        {/* TREC Sales */}
         <motion.div
-          className="text-xl font-bold flex items-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+          className="text-center mb-12"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
         >
-          <motion.span
-            className="text-red-500"
+          <motion.h1
+            className="text-5xl font-bold text-blue-500 tracking-wide"
             animate={{
-              scale: [1, 1.1, 1],
+              textShadow: [
+                "0 0 0px rgba(59, 130, 246, 0)",
+                "0 0 10px rgba(59, 130, 246, 0.3)",
+                "0 0 0px rgba(59, 130, 246, 0)",
+              ],
             }}
             transition={{
-              duration: 1,
+              duration: 2,
               repeat: Number.POSITIVE_INFINITY,
-              repeatType: "reverse",
+              ease: "easeInOut",
             }}
           >
-            TRECSell
-          </motion.span>
+            TREC | Sales
+          </motion.h1>
         </motion.div>
 
-        <motion.p
-          className="text-gray-500 mt-2 text-sm"
+        
+
+        {/* Loading indicator */}
+        <motion.div
+          className="absolute bottom-20 left-1/2 transform -translate-x-1/2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
         >
-          Smart Selling for Real Estate
-        </motion.p>
-
-        <motion.div
-          className="mt-8 flex space-x-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-        >
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-3 h-3 bg-red-500 rounded-full"
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.7, 1, 0.7],
-              }}
-              transition={{
-                duration: 1,
-                repeat: Number.POSITIVE_INFINITY,
-                repeatType: "loop",
-                delay: i * 0.2,
-              }}
-            />
-          ))}
+          <div className="flex space-x-1">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-2 h-2 bg-blue-400 rounded-full"
+                animate={{
+                  y: [0, -8, 0],
+                }}
+                transition={{
+                  duration: 0.8,
+                  repeat: Number.POSITIVE_INFINITY,
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+          </div>
         </motion.div>
-      </motion.div>
+      </div>
     </motion.div>
-  );
+  )
 }

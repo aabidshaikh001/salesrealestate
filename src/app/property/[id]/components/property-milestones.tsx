@@ -49,7 +49,7 @@ export default function PropertyMilestones({ propertyId }: PropertyMilestonesPro
       className="p-4 border-b"
     >
       <div className="mb-4">
-        <h3 className="font-semibold text-lg">Milestones</h3>
+        <h3 className="font-semibold text-lg">Brokerage Milestones</h3>
       </div>
 
       {loading ? (

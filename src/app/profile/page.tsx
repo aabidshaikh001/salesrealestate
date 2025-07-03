@@ -24,6 +24,9 @@ import Footer from "../component/footer"
 import Header from "../component/header"
 import { useAuth } from "@/providers/auth-provider"
 import LoadingSpinner from "@/components/loading-spinner"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import ProtectedRoute from "@/providers/ProtectedRoute"
+
 
 export default function ProfileDashboardPage() {
   const { user, isLoading, isAuthenticated, logout } = useAuth()
@@ -83,11 +86,12 @@ export default function ProfileDashboardPage() {
   }
 
   return (
+  <ProtectedRoute>
     <div className="pb-20 min-h-screen bg-gray-50">
       <Header />
       <ToastContainer />
       <header className="flex items-center p-4 border-b bg-white shadow-sm sticky top-0 z-10">
-        <Link href="/" className="mr-4">
+        <Link href="/dashboard" className="mr-4">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <h1 className="text-lg font-medium">Profile</h1>
@@ -98,19 +102,12 @@ export default function ProfileDashboardPage() {
 
       <div className="flex flex-col items-center py-6 bg-white shadow-sm mb-4">
         <div className="relative mb-2">
-          <div className="h-24 w-24 rounded-full bg-red-100 flex items-center justify-center overflow-hidden border-4 border-white shadow">
-            {profileImage ? (
-              <Image
-                src={profileImage || "/placeholder.svg"}
-                alt="Profile"
-                width={96}
-                height={96}
-                className="object-cover"
-              />
-            ) : (
-              <User className="h-12 w-12 text-red-500" />
-            )}
-          </div>
+          <Avatar className="h-24 w-24 border-2 border-red-500 shadow-lg">
+            <AvatarImage src={profileImage || "/placeholder.svg"} alt={user?.name || "User"} />
+            <AvatarFallback className="bg-red-500 text-white font-bold">
+              {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+            </AvatarFallback>
+          </Avatar>
           <button
             className="absolute bottom-0 right-0 bg-red-500 rounded-full p-1.5 shadow-md"
             onClick={handleEditProfile}
@@ -198,6 +195,7 @@ export default function ProfileDashboardPage() {
 
       <Footer />
     </div>
+  </ProtectedRoute>
   )
 }
 

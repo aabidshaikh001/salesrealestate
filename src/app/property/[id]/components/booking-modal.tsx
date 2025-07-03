@@ -329,7 +329,7 @@
                   <X size={18} />
                 </button>
 
-                <h2 className="text-2xl font-bold text-center mb-8">Book a Visit</h2>
+                <h2 className="text-2xl font-bold text-center mb-8">Make A New Lead</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Property field - either dropdown (from footer) or disabled input (from property page) */}
@@ -688,10 +688,10 @@
                       {loading ? (
                         <span className="flex items-center">
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Booking...
+                          Creating Lead...
                         </span>
                       ) : (
-                        "Book Visit"
+                        "Create Lead"
                       )}
                     </Button>
                   </motion.div>

@@ -105,7 +105,8 @@ export function Ratings({ propertyId }: RatingsProps) {
                           {review.review}
                         </motion.p>
                       ) : (
-                        <p>{review.review.slice(0, 100)}...</p>
+                     <p>{(review.review || "").slice(0, 100)}...</p>
+
                       )}
                     </AnimatePresence>
                     <Button

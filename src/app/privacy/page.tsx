@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
 
       {/* Mobile app header with back button */}
       <motion.div className="flex items-center px-4 py-3 border-b border-gray-100" variants={itemVariants}>
-        <Link href="/" className="text-gray-800">
+        <Link href="/dashboard" className="text-gray-800">
           <ArrowLeft className="h-6 w-6" />
         </Link>
         <div className="flex-1 text-center font-medium">Privacy Policy</div>

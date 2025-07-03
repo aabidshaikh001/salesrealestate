@@ -7,7 +7,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 
 export interface Property {
-  id: string;
+ PropertyId: string
   title: string;
   location: string;
   price: string;
@@ -110,9 +110,9 @@ export default function PropertyCard({ property }: PropertyCardProps) {
               <p className="text-xs text-gray-500 mt-1">{property.discount}</p>
             </div>
             <div>
-              <Link href={`/property/${property.id}`}>
+              <Link href={`/property/${property.PropertyId}`} className="text-blue-600 hover:underline">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button className="bg-white text-blue-600 border border-blue-600 hover:bg-blue-50">Book Visit</Button>
+                  <Button className="bg-white text-blue-600 border border-blue-600 hover:bg-blue-50">Create Lead</Button>
                 </motion.div>
               </Link>
             </div>

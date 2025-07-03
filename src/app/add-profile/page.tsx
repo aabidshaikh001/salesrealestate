@@ -396,7 +396,7 @@ export default function AddProfilePage() {
     <div className="pb-20 min-h-screen bg-gray-50">
       
       <header className="flex items-center p-4 border-b bg-white shadow-sm sticky top-0 z-10">
-        <Link href="/" className="mr-4">
+        <Link href="/dashboard" className="mr-4">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <h1 className="text-lg font-medium">Complete Your Profile</h1>

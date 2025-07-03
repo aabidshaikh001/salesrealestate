@@ -1,43 +1,50 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import BookingModal from "./booking-modal"
-
+import MakeNewLeadSheet from "../../../component/LeadModal"
 
 interface PropertyCTAProps {
   propertyId: string
 }
 
-
-
-
-
 export default function PropertyCTA({ propertyId }: PropertyCTAProps) {
-  const [ctaData, setCtaData] = useState<{ price: string; discount: string } | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
- 
+  const [ctaData, setCtaData] = useState<{
+    title: string
+    location: string
+    price: string
+    discount: string
+  } | null>(null)
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   useEffect(() => {
     const fetchCTAData = async () => {
       try {
-     
-        
-  
-        const response = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`);
-     
-        if (!response.ok) throw new Error("Failed to fetch");
-        const data = await response.json();
-        setCtaData(data || { price: "₹ 4.50 L - 7.25 Cr", discount: "Special offer: 8% discount" });
+        const response = await fetch(`https://api.realestatecompany.co.in/api/properties/${propertyId}`)
+        if (!response.ok) throw new Error("Failed to fetch")
+        const data = await response.json()
+
+        setCtaData({
+          title: data.title || "Property Title",
+          location: data.location || "Unknown Location",
+          price: data.price || "₹ 4.50 L - 7.25 Cr",
+          discount: data.discount || "Special offer: 8% discount",
+        })
       } catch (error) {
-        console.error("Error fetching CTA data:", error);
-        setCtaData({ price: "₹ 4.50 L - 7.25 Cr", discount: "Special offer: 8% discount" }); // Default fallback
+        console.error("Error fetching CTA data:", error)
+        setCtaData({
+          title: "Property Title",
+          location: "Unknown Location",
+          price: "₹ 4.50 L - 7.25 Cr",
+          discount: "Special offer: 8% discount",
+        })
       }
-    };
+    }
 
-    fetchCTAData();
-  }, [propertyId]);
-
+    fetchCTAData()
+  }, [propertyId])
 
   return (
     <>
@@ -48,21 +55,19 @@ export default function PropertyCTA({ propertyId }: PropertyCTAProps) {
         transition={{ delay: 0.5, type: "spring" }}
       >
         <div>
-        <h3 className="font-bold text-lg">{ctaData?.price}</h3>
-        <p className="text-xs text-gray-500">{ctaData?.discount}</p>
+          <h3 className="font-bold text-base">{ctaData?.title}</h3>
+          <p className="text-sm text-gray-600">{ctaData?.location}</p>
         </div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => setIsModalOpen(true)}>
-            Book Visit
+            Create Lead
           </Button>
         </motion.div>
       </motion.div>
 
-      <BookingModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        propertyId={propertyId}
-        propertyName={`Property ${propertyId}`}
+      <MakeNewLeadSheet 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
       />
     </>
   )

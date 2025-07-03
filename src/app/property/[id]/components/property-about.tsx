@@ -2,40 +2,82 @@
 
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"
+
+interface PropertyData {
+  projectId?: string
+}
+
+interface ProjectData {
+  projectDescription?: string
+  builderId?: string
+  // Add other fields as needed
+}
 
 interface PropertyAboutProps {
   propertyId: string
+  onBuilderIdChange?: (builderId: string) => void
 }
 
-
-
-export default function PropertyAbout({ propertyId }: PropertyAboutProps) {
+export default function PropertyAbout({ propertyId, onBuilderIdChange }: PropertyAboutProps) {
   const router = useRouter()
-   const [aboutData, setAboutData] = useState<string | null>(null);
- 
+  const [aboutData, setAboutData] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchAboutData = async () => {
+    const fetchProjectDetails = async () => {
       try {
-     
+        setLoading(true)
+        setError(null)
 
-        const response = await fetch(`https://api.realestatecompany.co.in/api/aboutproject/${propertyId}`);
-        if (!response.ok) throw new Error("Failed to fetch");
-        const data = await response.json();
-        setAboutData((data.projectDescription?.slice(0, 200) || "No description available.") + '...');
+        // Step 1: Fetch property data to get projectId
+        const propertyResponse = await fetch(
+          `https://api.realestatecompany.co.in/api/properties/${propertyId}`
+        )
 
-     
-      } catch (error) {
-        console.error("Error fetching about data:", error);
-        setAboutData("No description available.");
-      } 
-    };
+        if (!propertyResponse.ok) throw new Error("Property not found")
 
-    fetchAboutData();
-  }, [propertyId]);
+        const propertyResponseData = await propertyResponse.json()
+        const propertyData: PropertyData = propertyResponseData.data || propertyResponseData
 
-  // Handle "View Details" button click
+        if (!propertyData.projectId) {
+          setError("No project associated with this property.")
+          setAboutData("No description available.")
+          return
+        }
+
+        // Step 2: Fetch project details using projectId
+        const projectResponse = await fetch(
+          `https://api.realestatecompany.co.in/api/aboutproject/${propertyData.projectId}`
+        )
+        if (!projectResponse.ok) throw new Error("Project not found")
+
+        const projectResponseData = await projectResponse.json()
+        const projectData: ProjectData = projectResponseData.data
+
+      const description =
+  (typeof projectData.projectDescription === "string"
+    ? projectData.projectDescription.slice(0, 200)
+    : "No description available.") + "...";
+setAboutData(description);
+
+        // Notify parent component about builderId
+        if (onBuilderIdChange && projectData.builderId) {
+          onBuilderIdChange(projectData.builderId)
+        }
+      } catch (err) {
+        console.error("Error fetching project details:", err)
+        setError("Failed to load project details.")
+        setAboutData("No description available.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProjectDetails()
+  }, [propertyId, onBuilderIdChange])
+
   const handleViewDetails = () => {
     router.push(`/About-Project/${propertyId}`)
   }
@@ -54,7 +96,9 @@ export default function PropertyAbout({ propertyId }: PropertyAboutProps) {
         </button>
       </div>
 
-      <p className="text-sm text-gray-600">{aboutData}</p>
+      {loading && <p className="text-sm text-gray-600">Loading...</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
+      {!loading && !error && <p className="text-sm text-gray-600">{aboutData}</p>}
     </motion.div>
   )
 }

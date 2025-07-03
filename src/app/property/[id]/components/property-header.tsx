@@ -41,7 +41,8 @@ export default function PropertyHeader({ propertyId }: PropertyHeaderProps) {
       <div className="flex items-center justify-between p-4">
         <button onClick={() => router.back()} className="flex items-center text-gray-700">
           <FaArrowLeft className="mr-2" />
-          <span>{property.name}</span>
+          <span className="text-lg sm:text-xl font-semibold">Property Details</span>
+
         </button>
         <div className="flex gap-2">
           <button

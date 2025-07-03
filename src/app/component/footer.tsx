@@ -7,8 +7,9 @@ import { MdCurrencyRupee } from "react-icons/md"
 import { BsBuildingsFill } from "react-icons/bs"
 import EMICalculator from "./emi-calculator"
 import RaiseQuerySheet from "./raise-query-sheet"
-import BookingModal from "../property/[id]/components/booking-modal"
+import MakeNewLeadSheet from "./LeadModal"
 import AddCustomerSheet from "./add-customer-sheet"
+import { CgProfile } from "react-icons/cg";
 export default function Footer() {
   const pathname = usePathname()
   const router = useRouter()
@@ -18,10 +19,12 @@ export default function Footer() {
   const [isRaiseQueryOpen, setIsRaiseQueryOpen] = useState(false)
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
   const [isAddCustomerOpen, setIsAddCustomerOpen] = useState(false)
+    const [isSheetOpen, setIsSheetOpen] = useState(false)
+
 
   const navItems = useMemo(
     () => [
-      { name: "Home", icon: HomeIcon, id: "home", href: "/" },
+      { name: "Home", icon: HomeIcon, id: "home", href: "/dashboard" },
       { name: "Properties", icon: BsBuildingsFill, id: "Properties", href: "/Properties" },
       { name: "", icon: Plus, id: "visit", href: "#" },
      
@@ -29,7 +32,7 @@ export default function Footer() {
   
       { name: "Revenue", icon: MdCurrencyRupee, id: "Revenue", href: "/revenue" },
      
-      { name: "Profile", icon: Menu, id: "profile", href: "/profile" },
+      { name: "Profile", icon: CgProfile, id: "profile", href: "/profile" },
     ],
     [],
   )
@@ -50,8 +53,8 @@ export default function Footer() {
       setIsAddCustomerOpen(true)
     } 
 
-    else if (href === "/book-visit") {
-      setIsBookingModalOpen(true)
+    else if (href === "/make-new-lead") {
+      setIsSheetOpen(true)
     }else {
       router.push(href)
     }
@@ -60,7 +63,7 @@ export default function Footer() {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-2">
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-br from-amber-300 to-yellow-300 shadow-lg border-t border-gray-200 p-2">
         <div className="flex justify-between items-center relative">
           {navItems.map((item) => (
             <button
@@ -74,12 +77,12 @@ export default function Footer() {
                 }
               }}
               className={`flex flex-col items-center justify-center p-2 relative ${
-                activeTab === item.id ? "text-red-500" : "text-gray-500"
+                activeTab === item.id ? "text-red-500" : "text-gray-900"
               }`}
             >
               {item.id === "visit" ? (
-                <div className="bg-red-500 rounded-full p-3 -mt-8 mb-1 text-white">
-                  <item.icon className="h-7 w-7" />
+                <div className="bg-red-500 rounded-full p-3 -mt-10 mb-1 text-white">
+                  <item.icon className="h-12 w-12" />
                 </div>
               ) : (
                 <item.icon className="h-7 w-7" />
@@ -93,8 +96,10 @@ export default function Footer() {
         {isMenuOpen && (
           <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-white shadow-xl rounded-lg w-48 p-2">
             {[
-              { name: "Book a Visit", href: "/book-visit" },
-              { name: "Add New Customer", href: "/add-customer" },
+              { name: "Assigned Leads", href: "/leads" },
+              { name: "New Lead", href: "/make-new-lead" },
+              
+              // { name: "Add New Customer", href: "/add-customer" },
               { name: "Raise Query", href: "/raise-query" },
               { name: "EMI Calculator", href: "/emi-calculator" },
             ].map((item, index) => (
@@ -115,8 +120,10 @@ export default function Footer() {
 
       {/* Raise Query Sheet */}
       <RaiseQuerySheet isOpen={isRaiseQueryOpen} onClose={() => setIsRaiseQueryOpen(false)} />
-      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} isFromFooter={true} />
-        
+        <MakeNewLeadSheet 
+        isOpen={isSheetOpen} 
+        onClose={() => setIsSheetOpen(false)} 
+      />
       <AddCustomerSheet isOpen={isAddCustomerOpen} onClose={() => setIsAddCustomerOpen(false)} />
     </>
   )
